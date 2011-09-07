@@ -16,6 +16,7 @@ cmd:option('-hardtanh', false, 'use hardtanh instead of tanh')
 cmd:option('-convfast', false, 'use "fast" convolution code instead of standard')
 cmd:option('-openmp', false, 'use openmp *package*')
 cmd:option('-double', false, 'use doubles instead of floats')
+cmd:option('-cuda', false, 'use CUDA instead of floats')
 cmd:option('-gi', false, 'compute gradInput')
 cmd:option('-v', false, 'be verbose')
 cmd:option('-batch', 1, 'batch size')
@@ -47,12 +48,21 @@ if params.hardtanh then
    nn.Tanh = nn.HardTanh
 end
 
+if params.double and params.cuda then
+   error('make your choice between double and cuda!!')
+end
+
 if params.double then
    torch.setdefaulttensortype('torch.DoubleTensor')
+elseif params.cuda then
+   require 'cunn'
+   dofile('cudahacks.lua')
+   torch.setdefaulttensortype('torch.CudaTensor')
 else
    torch.setdefaulttensortype('torch.FloatTensor')
 end
 
+local defaulttype = torch.getdefaulttensortype()
 local noutput = 10
 
 if not params.nomlp then
@@ -87,6 +97,12 @@ if not params.nomlp then
    if true then -- MLP 784/10
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.Linear(ninput, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -96,7 +112,12 @@ if not params.nomlp then
          mlp:get(1).gradInput = nil
       end
 
-      local criterion = nn.ClassNLLCriterion()  
+      local criterion = nn.ClassNLLCriterion()
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
 
       trainer.learningRate = 0.01
@@ -112,6 +133,12 @@ if not params.nomlp then
       mlp:add(nn.Linear(ninput, 500))
       mlp:add(nn.Tanh())
       mlp:add(nn.Linear(500, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -122,6 +149,11 @@ if not params.nomlp then
       end
 
       local criterion = nn.ClassNLLCriterion()  
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
 
       trainer.learningRate = 0.01
@@ -142,6 +174,12 @@ if not params.nomlp then
       mlp:add(nn.Linear(1000, 1000))
       mlp:add(nn.Tanh())
       mlp:add(nn.Linear(1000, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -152,6 +190,11 @@ if not params.nomlp then
       end
 
       local criterion = nn.ClassNLLCriterion()  
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
 
       trainer.learningRate = 0.01
