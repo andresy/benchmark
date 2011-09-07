@@ -1,5 +1,4 @@
 require "lab"
-require "os"
 require "nn"
 
 cmd = torch.CmdLine()
@@ -15,9 +14,9 @@ cmd:option('-nexmlp', 10000, '# of examples for the MLPs')
 cmd:option('-nexcnn', 1000, '# of examples for the CNNs')
 cmd:option('-hardtanh', false, 'use hardtanh instead of tanh')
 cmd:option('-convfast', false, 'use "fast" convolution code instead of standard')
-cmd:option('-openmp', false, 'use openmp')
+cmd:option('-openmp', false, 'use openmp *package*')
 cmd:option('-double', false, 'use doubles instead of floats')
-cmd:option('-nogi', false, 'do not compute gradInput')
+cmd:option('-gi', false, 'compute gradInput')
 cmd:option('-v', false, 'be verbose')
 
 cmd:text()
@@ -73,7 +72,10 @@ if not params.nomlp then
       mlp:add(nn.Linear(ninput, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
 
@@ -95,7 +97,10 @@ if not params.nomlp then
       mlp:add(nn.Linear(500, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
 
@@ -122,7 +127,10 @@ if not params.nomlp then
       mlp:add(nn.Linear(1000, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
 
@@ -171,7 +179,10 @@ if not params.nocnn then
       mlp:add(nn.Linear(120, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
       
@@ -203,7 +214,10 @@ if not params.nocnn then
       mlp:add(nn.Linear(120, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
       
@@ -235,7 +249,10 @@ if not params.nocnn then
       mlp:add(nn.Linear(120, noutput))
       mlp:add(nn.LogSoftMax())
 
-      if params.nogi then
+      if not params.gi then
+         if params.v then
+            print('# do not compute gradInput')
+         end
          mlp:get(1).gradInput = nil
       end
 
