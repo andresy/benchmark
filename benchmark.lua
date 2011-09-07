@@ -10,7 +10,7 @@ cmd:text()
 cmd:text('Misc options:')
 cmd:option('-nomlp', false, 'do not perform MLP tests')
 cmd:option('-nocnn', false, 'do not perform CNN tests')
-cmd:option('-nexmlp', 10000, '# of examples for the MLPs')
+cmd:option('-nexmlp', 60000, '# of examples for the MLPs')
 cmd:option('-nexcnn', 1000, '# of examples for the CNNs')
 cmd:option('-hardtanh', false, 'use hardtanh instead of tanh')
 cmd:option('-convfast', false, 'use "fast" convolution code instead of standard')
@@ -18,6 +18,7 @@ cmd:option('-openmp', false, 'use openmp *package*')
 cmd:option('-double', false, 'use doubles instead of floats')
 cmd:option('-gi', false, 'compute gradInput')
 cmd:option('-v', false, 'be verbose')
+cmd:option('-batch', 1, 'batch size')
 
 cmd:text()
 
@@ -59,13 +60,29 @@ if not params.nomlp then
    local ninput = 784
    local dataset = {}
    local data = lab.randn(params.nexmlp, ninput)
-   function dataset:size()
-      return params.nexmlp
+   local label = torch.Tensor(params.nexmlp)
+   for i=1,params.nexmlp do
+      label[i] = (i % noutput) + 1
    end
+   
+   if params.batch == 1 then
+      function dataset:size()
+         return params.nexmlp
+      end
 
-   setmetatable(dataset, {__index = function(self, index)
-                                       return {data[index], (index % noutput) + 1}
-                                    end})
+      setmetatable(dataset, {__index = function(self, index)
+                                          return {data[index], label[index]}
+                                       end})
+   else
+      assert(params.nexmlp % params.batch == 0, '# of examples must be divisible with batch size')
+      function dataset:size()
+         return params.nexmlp/params.batch
+      end
+      setmetatable(dataset, {__index = function(self, index)
+                                          return {data:narrow(1,(index-1)*params.batch+1, params.batch),
+                                                  label:narrow(1,(index-1)*params.batch+1, params.batch)}
+                                       end})
+   end
 
    if true then -- MLP 784/10
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
