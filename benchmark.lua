@@ -103,7 +103,11 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      mlp:add(nn.LogSoftMax())
+      if params.batch == 1 then
+         mlp:add(nn.LogSoftMax())
+      else
+         mlp:add(nn.TemporalLogSoftMax())
+      end
 
       if not params.gi then
          if params.v then
@@ -139,7 +143,11 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      mlp:add(nn.LogSoftMax())
+      if params.batch == 1 then
+         mlp:add(nn.LogSoftMax())
+      else
+         mlp:add(nn.TemporalLogSoftMax())
+      end
 
       if not params.gi then
          if params.v then
@@ -180,7 +188,11 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      mlp:add(nn.LogSoftMax())
+      if params.batch == 1 then
+         mlp:add(nn.LogSoftMax())
+      else
+         mlp:add(nn.TemporalLogSoftMax())
+      end
 
       if not params.gi then
          if params.v then
