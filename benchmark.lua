@@ -70,7 +70,7 @@ if not params.nomlp then
    local ninput = 784
    local dataset = {}
    local data = lab.randn(params.nexmlp, ninput)
-   local label = torch.Tensor(params.nexmlp)
+   local label = torch.LongTensor(params.nexmlp)
    for i=1,params.nexmlp do
       label[i] = (i % noutput) + 1
    end
