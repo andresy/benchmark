@@ -229,8 +229,6 @@ if not params.nocnn then
             return nex/params.batch
          end
          setmetatable(dataset, {__index = function(self, index)
-                                             print(data:narrow(1,(index-1)*params.batch+1, params.batch):size())
-                                             print(label:narrow(1,(index-1)*params.batch+1, params.batch):size())
                                              return {data:narrow(1,(index-1)*params.batch+1, params.batch),
                                                      label:narrow(1,(index-1)*params.batch+1, params.batch)}
                                           end})
