@@ -11,7 +11,7 @@ cmd:text('Misc options:')
 cmd:option('-nomlp', false, 'do not perform MLP tests')
 cmd:option('-nocnn', false, 'do not perform CNN tests')
 cmd:option('-nexmlp', 60000, '# of examples for the MLPs')
-cmd:option('-nexcnn', 1000, '# of examples for the CNNs')
+cmd:option('-nexcnn', 6000, '# of examples for the CNNs')
 cmd:option('-hardtanh', false, 'use hardtanh instead of tanh')
 cmd:option('-convfast', false, 'use "fast" convolution code instead of standard')
 cmd:option('-openmp', false, 'use openmp *package*')
@@ -62,7 +62,6 @@ else
    torch.setdefaulttensortype('torch.FloatTensor')
 end
 
-local defaulttype = torch.getdefaulttensortype()
 local noutput = 10
 
 if not params.nomlp then
@@ -103,11 +102,7 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      if params.batch == 1 then
-         mlp:add(nn.LogSoftMax())
-      else
-         mlp:add(nn.TemporalLogSoftMax())
-      end
+      mlp:add(nn.LogSoftMax())
 
       if not params.gi then
          if params.v then
@@ -143,12 +138,8 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      if params.batch == 1 then
-         mlp:add(nn.LogSoftMax())
-      else
-         mlp:add(nn.TemporalLogSoftMax())
-      end
-
+      mlp:add(nn.LogSoftMax())
+      
       if not params.gi then
          if params.v then
             print('# do not compute gradInput')
@@ -188,11 +179,7 @@ if not params.nomlp then
          torch.setdefaulttensortype('torch.FloatTensor')
       end
 
-      if params.batch == 1 then
-         mlp:add(nn.LogSoftMax())
-      else
-         mlp:add(nn.TemporalLogSoftMax())
-      end
+      mlp:add(nn.LogSoftMax())
 
       if not params.gi then
          if params.v then
@@ -223,13 +210,31 @@ if not params.nocnn then
    function createcnndataset(nex,w,h)
       local dataset = {}
       local data = lab.randn(nex, 1, w, h)
-      function dataset:size()
-         return nex
+      local label = torch.LongTensor(params.nexmlp)
+      for i=1,params.nexmlp do
+         label[i] = (i % noutput) + 1
       end
 
-      setmetatable(dataset, {__index = function(self, index)
-                                          return {data[index], (index % noutput) + 1}
-                                       end})
+      if params.batch == 1 then
+         function dataset:size()
+            return nex
+         end
+
+         setmetatable(dataset, {__index = function(self, index)
+                                             return {data[index], label[index]}
+                                          end})
+      else
+         assert(nex % params.batch == 0, '# of examples must be divisible with batch size')
+         function dataset:size()
+            return nex/params.batch
+         end
+         setmetatable(dataset, {__index = function(self, index)
+                                             print(data:narrow(1,(index-1)*params.batch+1, params.batch):size())
+                                             print(label:narrow(1,(index-1)*params.batch+1, params.batch):size())
+                                             return {data:narrow(1,(index-1)*params.batch+1, params.batch),
+                                                     label:narrow(1,(index-1)*params.batch+1, params.batch)}
+                                          end})
+      end
 
       return dataset
    end
@@ -249,6 +254,12 @@ if not params.nocnn then
       mlp:add(nn.Reshape(16*5*5))
       mlp:add(nn.Linear(16*5*5, 120))
       mlp:add(nn.Linear(120, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -259,6 +270,11 @@ if not params.nocnn then
       end
       
       local criterion = nn.ClassNLLCriterion()  
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
 
       trainer.learningRate = 0.01
@@ -284,6 +300,12 @@ if not params.nocnn then
       mlp:add(nn.Reshape(16*8*8))
       mlp:add(nn.Linear(16*8*8, 120))
       mlp:add(nn.Linear(120, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -294,6 +316,11 @@ if not params.nocnn then
       end
       
       local criterion = nn.ClassNLLCriterion()  
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
 
       trainer.learningRate = 0.01
@@ -319,6 +346,12 @@ if not params.nocnn then
       mlp:add(nn.Reshape(16*11*11))
       mlp:add(nn.Linear(16*11*11, 120))
       mlp:add(nn.Linear(120, noutput))
+
+      if params.cuda then
+         mlp:add(nn.Copy('torch.CudaTensor', 'torch.FloatTensor'))
+         torch.setdefaulttensortype('torch.FloatTensor')
+      end
+
       mlp:add(nn.LogSoftMax())
 
       if not params.gi then
@@ -329,6 +362,11 @@ if not params.nocnn then
       end
 
       local criterion = nn.ClassNLLCriterion()  
+
+      if params.cuda then
+         torch.setdefaulttensortype('torch.CudaTensor')
+      end
+
       local trainer = nn.StochasticGradient(mlp, criterion)
       
       trainer.learningRate = 0.01
