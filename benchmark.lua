@@ -94,6 +94,7 @@ if not params.nomlp then
    end
 
    if true then -- MLP 784/10
+      collectgarbage()
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.Linear(ninput, noutput))
 
@@ -128,6 +129,7 @@ if not params.nomlp then
    end
 
    if true then -- MLP 784/500/10
+      collectgarbage()
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.Linear(ninput, 500))
       mlp:add(nn.Tanh())
@@ -165,6 +167,7 @@ if not params.nomlp then
 
 
    if true then --MLP 784/1000/1000/1000/10
+      collectgarbage()
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.Linear(ninput, 1000))
       mlp:add(nn.Tanh())
@@ -238,6 +241,7 @@ if not params.nocnn then
    end
       
    if true then --LeNet5-like 32x32
+      collectgarbage()
       local dataset = createcnndataset(params.nexcnn, 32, 32)
 
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
@@ -284,6 +288,7 @@ if not params.nocnn then
    end
    
    if true then --LeNet5-like 96x96
+      collectgarbage()
       local dataset = createcnndataset(params.nexcnn, 96, 96)
 
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
@@ -330,6 +335,7 @@ if not params.nocnn then
    end
 
    if true then --LeNet5-like 256x256
+      collectgarbage()
       local dataset = createcnndataset(params.nexcnn, 256, 256)
 
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
