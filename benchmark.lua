@@ -1,4 +1,4 @@
-require "lab"
+require 'lab'
 require "nn"
 
 cmd = torch.CmdLine()
@@ -20,8 +20,28 @@ cmd:option('-cuda', false, 'use CUDA instead of floats')
 cmd:option('-gi', false, 'compute gradInput')
 cmd:option('-v', false, 'be verbose')
 cmd:option('-batch', 1, 'batch size')
+cmd:option('-hooks', false, 'add hooks useful for debug')
 
 cmd:text()
+
+function hooks(params)
+   local n = 0
+   local err = 0
+   local function hookExample(self)
+      err = err + self.criterion.output
+      n = n + 1
+   end
+
+   local function hookIteration(self)
+      printlog(string.format('mean err = %.3f', err/n))
+      err = 0
+      n = 0
+   end
+
+   if params.hooks then
+      return hookExample, hookIteration
+   end
+end
 
 local params = cmd:parse(arg)
 
@@ -120,6 +140,7 @@ if not params.nomlp then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
 
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1
@@ -157,6 +178,7 @@ if not params.nomlp then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
 
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1
@@ -199,6 +221,7 @@ if not params.nomlp then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
 
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1
@@ -279,6 +302,7 @@ if not params.nocnn then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
 
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1
@@ -326,6 +350,7 @@ if not params.nocnn then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
 
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1
@@ -373,6 +398,7 @@ if not params.nocnn then
 
       local trainer = nn.StochasticGradient(mlp, criterion)
       
+      trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
       trainer.maxIteration = 1

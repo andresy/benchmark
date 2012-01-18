@@ -1,17 +1,15 @@
-torch.CudaTensor.lab = {}
-
-local lab = torch.CudaTensor.lab
-
-function lab.randn(...)
-   local t = torch.FloatTensor.lab.randn(...)
-   return torch.Tensor(t:size()):copy(t)
+if lab == torch then
+   torch.CudaTensor.torch = {}
+   
+   function torch.CudaTensor.torch.randn(...)
+      local t = torch.FloatTensor.torch.randn(...)
+      return torch.Tensor(t:size()):copy(t)
+   end
+else
+   torch.CudaTensor.lab = {}
+   
+   function torch.CudaTensor.lab.randn(...)
+      local t = torch.FloatTensor.lab.randn(...)
+      return torch.Tensor(t:size()):copy(t)
+   end
 end
-
--- local nn = torch.CudaTensor.nn
-
--- function nn.LogSoftMax_forward(self, input)
---    local t = torch.FloatTensor(input:size()):copy(input)
---    self.output = torch.FloatTensor()
---    return torch.FloatTensor.nn.LogSoftMax_forward(self, t)
--- end
-
