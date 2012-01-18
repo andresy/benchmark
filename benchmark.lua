@@ -20,6 +20,7 @@ cmd:option('-cuda', false, 'use CUDA instead of floats')
 cmd:option('-gi', false, 'compute gradInput')
 cmd:option('-v', false, 'be verbose')
 cmd:option('-batch', 1, 'batch size')
+cmd:option('-iter', 1, 'number of iterations to perform')
 cmd:option('-hooks', false, 'add hooks useful for debug')
 
 cmd:text()
@@ -143,10 +144,10 @@ if not params.nomlp then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("mlp_%i_%i\t%.2f", ninput, noutput, params.nexmlp/t:time().real))
+      printlog(string.format("mlp_%i_%i\t%.2f", ninput, noutput, params.iter*params.nexmlp/t:time().real))
    end
 
    if true then -- MLP 784/500/10
@@ -181,10 +182,10 @@ if not params.nomlp then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("mlp_%i_500_%i\t%.2f", ninput, noutput, params.nexmlp/t:time().real))
+      printlog(string.format("mlp_%i_500_%i\t%.2f", ninput, noutput, params.iter*params.nexmlp/t:time().real))
    end
 
 
@@ -224,10 +225,10 @@ if not params.nomlp then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("mlp_%i_1000_1000_1000_%i\t%.2f", ninput, noutput, params.nexmlp/t:time().real))
+      printlog(string.format("mlp_%i_1000_1000_1000_%i\t%.2f", ninput, noutput, params.iter*params.nexmlp/t:time().real))
    end
 end
 
@@ -305,10 +306,10 @@ if not params.nocnn then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("cnn_32x32\t%.2f", params.nexcnn/t:time().real))
+      printlog(string.format("cnn_32x32\t%.2f", params.iter*params.nexcnn/t:time().real))
    end
    
    if true then --LeNet5-like 96x96
@@ -353,10 +354,10 @@ if not params.nocnn then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("cnn_96x96\t%.2f", params.nexcnn/t:time().real))
+      printlog(string.format("cnn_96x96\t%.2f", params.iter*params.nexcnn/t:time().real))
    end
 
    if true then --LeNet5-like 256x256
@@ -401,9 +402,9 @@ if not params.nocnn then
       trainer.hookExample, trainer.hookIteration = hooks(params)
       trainer.learningRate = 0.01
       trainer.shuffleIndices = false
-      trainer.maxIteration = 1
+      trainer.maxIteration = params.iter
       local t = torch.Timer()
       trainer:train(dataset)
-      printlog(string.format("cnn_256x256\t%.2f", params.nexcnn/t:time().real))
+      printlog(string.format("cnn_256x256\t%.2f", params.iter*params.nexcnn/t:time().real))
    end
 end
