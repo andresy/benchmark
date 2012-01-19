@@ -1,4 +1,5 @@
 require 'lab'
+require 'random'
 require "nn"
 
 cmd = torch.CmdLine()
