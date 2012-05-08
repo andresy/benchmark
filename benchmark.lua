@@ -80,6 +80,7 @@ elseif params.cuda then
    require 'cunn'
    dofile('cudahacks.lua')
    torch.setdefaulttensortype('torch.CudaTensor')
+   print(  cutorch.getDeviceProperties(cutorch.getDevice()) )
 else
    torch.setdefaulttensortype('torch.FloatTensor')
 end

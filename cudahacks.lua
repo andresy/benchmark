@@ -5,6 +5,9 @@ if lab == torch then
       local t = torch.FloatTensor.torch.randn(...)
       return torch.Tensor(t:size()):copy(t)
    end
+
+   torch.CudaTensor.torch.uniform = torch.Tensor.uniform
+
 else
    torch.CudaTensor.lab = {}
    
