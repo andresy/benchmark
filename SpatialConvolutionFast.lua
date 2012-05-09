@@ -31,14 +31,14 @@ function SpatialConvolutionFast:reset(stdv)
       stdv = 1/math.sqrt(self.kW*self.kH*self.nInputPlane)
    end
    self.weight:apply(function()
-                        return random.uniform(-stdv, stdv)
+                        return torch.uniform(-stdv, stdv)
                      end)
    self.bias:apply(function()
-                      return random.uniform(-stdv, stdv)
+                      return torch.uniform(-stdv, stdv)
                    end)   
 end
 
-function SpatialConvolutionFast:forward(input)   
+function SpatialConvolutionFast:updateOutput(input)   
    input = input:unfold(2, self.kH, self.dH)
    input = input:unfold(3, self.kW, self.dW)
    input = input:transpose(2,4)
@@ -54,7 +54,7 @@ function SpatialConvolutionFast:forward(input)
    return self.output
 end
 
-function SpatialConvolutionFast:backward(input, gradOutput)
+function SpatialConvolutionFast:updateGradInput(input, gradOutput)
    if self.gradInput then
       gradOutput = input.new(gradOutput:storage(), 1, gradOutput:size(1), -1, gradOutput:size(2)*gradOutput:size(3), -1)
       
@@ -69,12 +69,12 @@ function SpatialConvolutionFast:backward(input, gradOutput)
       gradInput:add(self.fgradInput)
 
       return self.gradInput
-
    end
 end
 
 function SpatialConvolutionFast:accGradParameters(input, gradOutput, scale)
+   scale = scale or 1
    gradOutput = input.new(gradOutput:storage(), 1, gradOutput:size(1), -1, gradOutput:size(2)*gradOutput:size(3), -1)
-   self.gradWeight:addmm(1, gradOutput, self.finput:t())
-   input.new(self.gradBias:storage(), 1, gradOutput:size(1), 1, gradOutput:size(2), 0):add(gradOutput)
+   self.gradWeight:addmm(scale, gradOutput, self.finput:t())
+   input.new(self.gradBias:storage(), 1, gradOutput:size(1), 1, gradOutput:size(2), 0):add(scale, gradOutput)
 end
