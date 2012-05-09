@@ -273,11 +273,11 @@ if not params.nocnn then
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.SpatialConvolution(1, 6, 5, 5)) -- output 28x28
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(6, 2, 2, 2, 2)) --output 14x14
+      mlp:add(nn.SpatialMaxPooling(2, 2, 2, 2)) --output 14x14
       mlp:add(nn.Tanh())
       mlp:add(nn.SpatialConvolution(6, 16, 5, 5)) -- output 10x10
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(16, 2, 2, 2, 2)) -- output 5x5
+      mlp:add(nn.SpatialMaxPooling(2, 2, 2, 2)) -- output 5x5
       mlp:add(nn.Tanh())
       mlp:add(nn.Reshape(16*5*5))
       mlp:add(nn.Linear(16*5*5, 120))
@@ -321,11 +321,11 @@ if not params.nocnn then
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.SpatialConvolution(1, 6, 7, 7)) -- output 90x90
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(6, 3, 3, 3, 3)) --output 30x30
+      mlp:add(nn.SpatialMaxPooling(3, 3, 3, 3)) --output 30x30
       mlp:add(nn.Tanh())
       mlp:add(nn.SpatialConvolution(6, 16, 7, 7)) -- output 24x24
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(16, 3, 3, 3, 3)) -- output 8x8
+      mlp:add(nn.SpatialMaxPooling(3, 3, 3, 3)) -- output 8x8
       mlp:add(nn.Tanh())
       mlp:add(nn.Reshape(16*8*8))
       mlp:add(nn.Linear(16*8*8, 120))
@@ -369,11 +369,11 @@ if not params.nocnn then
       local mlp = nn.Sequential();                 -- make a multi-layer perceptron
       mlp:add(nn.SpatialConvolution(1, 6, 7, 7)) -- output 250x250
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(6, 5, 5, 5, 5)) --output 50x50
+      mlp:add(nn.SpatialMaxPooling(5, 5, 5, 5)) --output 50x50
       mlp:add(nn.Tanh())
       mlp:add(nn.SpatialConvolution(6, 16, 7, 7)) -- output 44x44
       mlp:add(nn.Tanh())
-      mlp:add(nn.SpatialSubSampling(16, 4, 4, 4, 4)) -- output 11x11
+      mlp:add(nn.SpatialMaxPooling(4, 4, 4, 4)) -- output 11x11
       mlp:add(nn.Tanh())
       mlp:add(nn.Reshape(16*11*11))
       mlp:add(nn.Linear(16*11*11, 120))
