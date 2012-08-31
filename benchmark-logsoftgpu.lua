@@ -1,5 +1,3 @@
-require 'lab'
-require 'random'
 require "nn"
 
 cmd = torch.CmdLine()
@@ -47,7 +45,7 @@ end
 
 local params = cmd:parse(arg)
 
-random.manualSeed(5555)
+torch.manualSeed(5555)
 
 if params.v then
    printlog = print
@@ -91,7 +89,7 @@ if not params.nomlp then
 
    local ninput = 784
    local dataset = {}
-   local data = lab.randn(params.nexmlp, ninput)
+   local data = torch.randn(params.nexmlp, ninput)
    local label = torch.LongTensor(params.nexmlp)
    for i=1,params.nexmlp do
       label[i] = (i % noutput) + 1
@@ -208,7 +206,7 @@ if not params.nocnn then
 
    function createcnndataset(nex,w,h)
       local dataset = {}
-      local data = lab.randn(nex, 1, w, h)
+      local data = torch.randn(nex, 1, w, h)
       local label = torch.LongTensor(params.nexmlp)
       for i=1,params.nexmlp do
          label[i] = (i % noutput) + 1
