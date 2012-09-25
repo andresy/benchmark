@@ -47,8 +47,11 @@ function SpatialConvolutionFast:updateOutput(input)
    self.finput:resize(self.kW*self.kH*self.nInputPlane, input:size(4)*input:size(5)):copy(input)
 
    self.output:resize(self.nOutputPlane, input:size(4), input:size(5))
-   local output = input.new(self.output:storage(), 1, self.nOutputPlane, -1, input:size(4)*input:size(5), -1):copy(
-      input.new(self.bias:storage(), 1, self.nOutputPlane, 1, input:size(4)*input:size(5), 0))
+   local output = input.new(self.output:storage(), 1, self.nOutputPlane, -1, input:size(4)*input:size(5), -1)
+
+   for b=1,self.bias:size(1) do
+      self.output[b]:fill(self.bias[b])
+   end
 
    output:addmm(1, self.weight, self.finput)
    return self.output
@@ -76,5 +79,8 @@ function SpatialConvolutionFast:accGradParameters(input, gradOutput, scale)
    scale = scale or 1
    gradOutput = input.new(gradOutput:storage(), 1, gradOutput:size(1), -1, gradOutput:size(2)*gradOutput:size(3), -1)
    self.gradWeight:addmm(scale, gradOutput, self.finput:t())
-   input.new(self.gradBias:storage(), 1, gradOutput:size(1), 1, gradOutput:size(2), 0):add(scale, gradOutput)
+
+   for b=1,self.bias:size(1) do
+      self.gradBias[b] = self.gradBias[b] + scale*gradOutput[b]:sum()
+   end
 end

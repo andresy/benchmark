@@ -13,6 +13,7 @@ cmd:option('-nexmlp', 60000, '# of examples for the MLPs')
 cmd:option('-nexcnn', 6000, '# of examples for the CNNs')
 cmd:option('-hardtanh', false, 'use hardtanh instead of tanh')
 cmd:option('-convfast', false, 'use "fast" convolution code instead of standard')
+cmd:option('-convmm', false, 'use "mm" convolution code instead of standard')
 cmd:option('-openmp', false, 'use openmp *package*')
 cmd:option('-double', false, 'use doubles instead of floats')
 cmd:option('-cuda', false, 'use CUDA instead of floats')
@@ -62,6 +63,10 @@ end
 if params.convfast then
    dofile('SpatialConvolutionFast.lua')
    nn.SpatialConvolution = nn.SpatialConvolutionFast
+end
+
+if params.convmm then
+   nn.SpatialConvolution = nn.SpatialConvolutionMM
 end
 
 if params.hardtanh then
